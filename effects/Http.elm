@@ -9,6 +9,7 @@ import Task
 type alias Model =
   { topic : String
   , gifUrl : String
+  , error : Maybe Http.Error
   }
 
 main =
@@ -21,7 +22,7 @@ main =
 
 init : (Model, Cmd Msg)
 init =
-  (Model "cats" "waiting.gif", Cmd.none)
+  (Model "cats" "waiting.gif" Nothing, Cmd.none)
 
 subscriptions : Model -> Sub Msg
 subscriptions model =
@@ -49,9 +50,17 @@ update msg model =
     MorePlease ->
       (model, getRandomGif model.topic)
     FetchSucceed newUrl ->
-      (Model model.topic newUrl, Cmd.none)
-    FetchFail _ ->
-      (model, Cmd.none)
+      (Model model.topic newUrl Nothing, Cmd.none)
+    FetchFail error ->
+      (Model model.topic model.gifUrl (Just error), Cmd.none)
+
+maybeViewError : Model -> Html m
+maybeViewError model =
+  Maybe.withDefault
+    (span [] [])
+    (Maybe.map
+      (\err -> span [] [text (toString err)])
+      model.error)
 
 view : Model -> Html Msg
 view model =
@@ -59,4 +68,5 @@ view model =
   [ h2 [] [text model.topic]
   , img [src model.gifUrl] []
   , button [onClick MorePlease] [text "More Please!"]
+  , maybeViewError model
   ]
