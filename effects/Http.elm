@@ -1,7 +1,7 @@
 import Html exposing (..)
 import Html.App as App
-import Html.Attributes exposing (src)
-import Html.Events exposing (onClick)
+import Html.Attributes exposing (..)
+import Html.Events exposing (on, onClick, targetValue)
 import Http
 import Json.Decode as Json
 import Task
@@ -30,6 +30,7 @@ subscriptions model =
 
 type Msg =
   MorePlease
+  | ChangeTopic String
   | FetchSucceed String
   | FetchFail Http.Error
 
@@ -47,12 +48,14 @@ getRandomGif topic =
 update : Msg -> Model -> (Model, Cmd Msg)
 update msg model =
   case msg of
+    ChangeTopic topic ->
+      ({model | topic = topic}, Cmd.none)
     MorePlease ->
       (model, getRandomGif model.topic)
     FetchSucceed newUrl ->
-      (Model model.topic newUrl Nothing, Cmd.none)
+      ({model | gifUrl = newUrl, error = Nothing}, Cmd.none)
     FetchFail error ->
-      (Model model.topic model.gifUrl (Just error), Cmd.none)
+      ({model | error = (Just error)}, Cmd.none)
 
 maybeViewError : Model -> Html m
 maybeViewError model =
@@ -62,10 +65,18 @@ maybeViewError model =
       (\err -> span [] [text (toString err)])
       model.error)
 
+onSelect msg =
+  on "change" (Json.map msg targetValue)
+
 view : Model -> Html Msg
 view model =
   div []
-  [ h2 [] [text model.topic]
+  [
+  h2 [] [text model.topic],
+  select [onSelect ChangeTopic] [
+    option [value "cats"][text "cats"],
+    option [value "dogs"][text "dogs"]
+  ]
   , img [src model.gifUrl] []
   , button [onClick MorePlease] [text "More Please!"]
   , maybeViewError model
