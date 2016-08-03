@@ -5,7 +5,8 @@
     "license": "BSD3",
     "source-directories": [
         ".",
-        "modularity/pair-of-counters"
+        "modularity/pair-of-counters",
+        "gol"
     ],
     "exposed-modules": [],
     "dependencies": {
