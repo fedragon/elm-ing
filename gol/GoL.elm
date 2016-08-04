@@ -55,13 +55,17 @@ init =
 
 aliveNeighboursOf : Cell.Model -> List Cell.Model -> List Cell.Model
 aliveNeighboursOf cell cells =
-  List.filter
+  let
+    others =
+      List.filter
+        (\c -> c /= cell && c.alive == True)
+        cells
+  in
+    List.filter
     (\other ->
-      other.alive == True
-      && cell /= other
-      && (abs cell.x - other.x) <= cell.z
-      && (abs cell.y - other.y) <= cell.z)
-    cells
+      abs(cell.x - other.x) <= 1 &&
+        abs(cell.y - other.y) <= 1)
+    others
 
 updateCell : Cell.Model -> List Cell.Model -> Cell.Model
 updateCell cell cells =
