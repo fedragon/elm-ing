@@ -28,20 +28,21 @@ main =
   }
 
 raiseFromTheDead : Int -> Int -> Cmd Msg
-raiseFromTheDead total boardSize =
+raiseFromTheDead total boardSide =
   Random.generate
     RaiseFromTheDead
     (Random.list
       total
       (Random.pair
-        (Random.int 1 boardSize)
-        (Random.int 1 boardSize)))
+        (Random.int 1 boardSide)
+        (Random.int 1 boardSide)))
 
 init : (Model, Cmd Msg)
 init =
   let
-    boardSize = 4
-    cellSize = 30
+    boardSide = 10
+    cellSize = 20
+    initiallyAlive = boardSide * 2
     board =
       List.concatMap
         (\i ->
@@ -51,10 +52,10 @@ init =
                 x = i * cellSize
                 y = j * cellSize
               in (Cell.Model x y cellSize False))
-            [0..boardSize])
-        [0..boardSize]
+            [0..boardSide])
+        [0..boardSide]
   in
-    (Model 0 board True, raiseFromTheDead 5 boardSize)
+    (Model 0 board True, raiseFromTheDead initiallyAlive boardSide)
 
 aliveNeighboursOf : Cell.Model -> List Cell.Model -> List Cell.Model
 aliveNeighboursOf cell cells =
