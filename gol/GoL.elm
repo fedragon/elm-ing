@@ -15,6 +15,7 @@ type alias Model =
 
 type Msg =
   NextGen Time
+  | Restart
   | Pause
   | RaiseFromTheDead (List (Int, Int))
 
@@ -80,6 +81,10 @@ shouldBeAlive cell reborn =
 update : Msg -> Model -> (Model, Cmd Msg)
 update msg model =
   case msg of
+    Pause ->
+      ({ model | paused = (not model.paused) }, Cmd.none)
+    Restart ->
+      init
     RaiseFromTheDead reborn ->
       ({ model |
         cells =
@@ -89,8 +94,6 @@ update msg model =
             model.cells,
             paused = False
           }, Cmd.none)
-    Pause ->
-      ({ model | paused = (not model.paused) }, Cmd.none)
     NextGen _ ->
       ({ model |
         generation = model.generation + 1
@@ -109,7 +112,8 @@ view : Model -> Html Msg
 view model =
   div [] [
     span [] [text ("Generation: " ++ (toString model.generation))],
-    button [onClick Pause] [text "Pause/Resume"],
+    button [onClick Pause] [text (if (model.paused) then "Resume" else "Pause")],
+    button [onClick Restart] [text "Restart"],
     svg [ viewBox "0 0 300 300", height "300px", width "300px" ]
       (List.map Cell.view model.cells)
   ]
