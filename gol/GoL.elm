@@ -37,6 +37,10 @@ raiseFromTheDead total boardSide =
         (Random.int 1 boardSide)
         (Random.int 1 boardSide)))
 
+genCell : Int -> Int -> Int -> Cell.Model
+genCell i j cellSize =
+  (Cell.init (i * cellSize) (j * cellSize) cellSize False)
+
 init : (Model, Cmd Msg)
 init =
   let
@@ -47,11 +51,7 @@ init =
       List.concatMap
         (\i ->
           List.map
-            (\j ->
-              let
-                x = i * cellSize
-                y = j * cellSize
-              in (Cell.Model x y cellSize False))
+            (\j -> (genCell i j cellSize))
             [0..boardSide])
         [0..boardSide]
   in
