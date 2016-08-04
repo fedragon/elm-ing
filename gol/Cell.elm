@@ -38,7 +38,7 @@ update msg model =
 view : Model -> Svg a
 view model =
   let
-    color = if (model.alive) then "green" else "red"
+    color = if (model.alive) then "black" else "white"
   in
     rect
     [ x (model.x * model.z |> toString)
@@ -47,5 +47,5 @@ view model =
       , height (toString model.z)
       , fill color
       , stroke "black"
-      , strokeWidth "2px"
+      , strokeWidth "1px"
     ] []

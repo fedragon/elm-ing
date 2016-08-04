@@ -5,7 +5,7 @@ import Html.Events exposing (onClick)
 import Random
 import Svg exposing (svg)
 import Svg.Attributes exposing (height, viewBox, width)
-import Time exposing (Time, every, second)
+import Time exposing (Time, every, millisecond)
 
 type alias Model =
   { generation : Int
@@ -40,9 +40,9 @@ raiseFromTheDead total boardSide =
 init : (Model, Cmd Msg)
 init =
   let
-    boardSide = 3
-    cellSize = 20
-    initiallyAlive = boardSide * 2
+    boardSide = 30
+    cellSize = 15
+    initiallyAlive = boardSide * 3
     board =
       List.concatMap
         (\x ->
@@ -74,7 +74,7 @@ updateCell cell cells =
   in
     (Cell.update (Cell.Evolve neighbours) cell)
 
-shouldBeAlive cell reborn =
+shouldBeBorn cell reborn =
   List.member
     (cell.x, cell.y)
     reborn
@@ -91,23 +91,23 @@ update msg model =
         cells =
           List.map
             (\cell ->
-              if (shouldBeAlive cell reborn) then { cell | alive = True } else cell)
+              if (shouldBeBorn cell reborn) then
+                { cell | alive = True }
+              else cell)
             model.cells,
             paused = False
           }, Cmd.none)
     NextGen _ ->
-      ({ model |
-        generation = model.generation + 1
-        , cells = List.map (\cell -> (updateCell cell model.cells)) model.cells
-        },
-        Cmd.none)
+      ({ model | generation = model.generation + 1
+       , cells = List.map (\cell -> (updateCell cell model.cells)) model.cells
+       }, Cmd.none)
 
 subscriptions : Model -> Sub Msg
 subscriptions model =
   if (model.paused || List.all (\x -> not x.alive) model.cells) then
     Sub.none
   else
-    Time.every second NextGen
+    Time.every (250 * millisecond) NextGen
 
 view : Model -> Html Msg
 view model =
@@ -115,6 +115,6 @@ view model =
     span [] [text ("Generation: " ++ (toString model.generation))],
     button [onClick Pause] [text (if (model.paused) then "Resume" else "Pause")],
     button [onClick Restart] [text "Restart"],
-    svg [ viewBox "0 0 300 300", height "300px", width "300px" ]
+    svg [ viewBox "0 0 600 600", height "600px", width "600px" ]
       (List.map Cell.view model.cells)
   ]
