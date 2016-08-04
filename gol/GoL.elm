@@ -37,21 +37,17 @@ raiseFromTheDead total boardSide =
         (Random.int 1 boardSide)
         (Random.int 1 boardSide)))
 
-genCell : Int -> Int -> Int -> Cell.Model
-genCell i j cellSize =
-  (Cell.init (i * cellSize) (j * cellSize) cellSize False)
-
 init : (Model, Cmd Msg)
 init =
   let
-    boardSide = 10
+    boardSide = 3
     cellSize = 20
     initiallyAlive = boardSide * 2
     board =
       List.concatMap
-        (\i ->
+        (\x ->
           List.map
-            (\j -> (genCell i j cellSize))
+            (\y -> (Cell.init x y cellSize False))
             [0..boardSide])
         [0..boardSide]
   in
@@ -75,8 +71,8 @@ updateCell cell cells =
     (Cell.update (Cell.Evolve neighbours) cell)
 
 shouldBeAlive cell reborn =
-  List.any
-    (\(x, y) -> cell.x == x * cell.z && cell.y == y * cell.z)
+  List.member
+    (cell.x, cell.y)
     reborn
 
 update : Msg -> Model -> (Model, Cmd Msg)

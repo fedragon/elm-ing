@@ -41,8 +41,8 @@ view model =
     color = if (model.alive) then "green" else "red"
   in
     rect
-    [ x (toString model.x)
-      , y (toString model.y)
+    [ x (model.x * model.z |> toString)
+      , y (model.y * model.z |> toString)
       , width (toString model.z)
       , height (toString model.z)
       , fill color
