@@ -56,16 +56,23 @@ init =
 aliveNeighboursOf : Cell.Model -> List Cell.Model -> List Cell.Model
 aliveNeighboursOf cell cells =
   let
-    others =
+    adjacent = [
+      (cell.x - 1, cell.y - 1),
+      (cell.x    , cell.y - 1),
+      (cell.x + 1, cell.y - 1),
+      (cell.x - 1, cell.y),
+      (cell.x + 1, cell.y),
+      (cell.x - 1, cell.y + 1),
+      (cell.x    , cell.y + 1),
+      (cell.x + 1, cell.y + 1)]
+    valid =
       List.filter
-        (\c -> c /= cell && c.alive == True)
-        cells
+        (\(x, y) -> x > 0 && y > 0)
+      adjacent
   in
     List.filter
-    (\other ->
-      abs(cell.x - other.x) <= 1 &&
-        abs(cell.y - other.y) <= 1)
-    others
+      (\c -> c.alive && (List.member (c.x, c.y) valid))
+      cells
 
 updateCell : Cell.Model -> List Cell.Model -> Cell.Model
 updateCell cell cells =
